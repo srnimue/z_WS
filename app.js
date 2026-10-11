@@ -29,8 +29,11 @@ function renderMarkdown(src=""){
   let inList = false;
 
   const inline = (text) => escapeHtml(text)
+    .replace(/`([^`]+?)`/g, "<code>$1</code>")
+    .replace(/~~(.+?)~~/g, "<del>$1</del>")
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/__(.+?)__/g, "<strong>$1</strong>");
+    .replace(/__(.+?)__/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, "$1<em>$2</em>");
 
   for (let raw of lines){
     const line = raw.trimEnd();
@@ -42,7 +45,8 @@ function renderMarkdown(src=""){
     }
     if(inList){ html += "</ul>"; inList = false; }
 
-    if (/^###\s+/.test(line)) html += `<h3>${inline(line.replace(/^###\s+/,""))}</h3>`;
+    if (/^#\s+/.test(line)) html += `<h1>${inline(line.replace(/^#\s+/,""))}</h1>`;
+    else if (/^###\s+/.test(line)) html += `<h3>${inline(line.replace(/^###\s+/,""))}</h3>`;
     else if (/^##\s+/.test(line)) html += `<h2>${inline(line.replace(/^##\s+/,""))}</h2>`;
     else if (/^>\s?/.test(line)) html += `<blockquote>${inline(line.replace(/^>\s?/,""))}</blockquote>`;
     else if (/^(---+|___+)$/.test(line.trim())) html += "<hr>";
@@ -127,56 +131,22 @@ function bindToolbar(toolbar, textarea){
 
 
 let activeDecorTextarea = null;
-let activeDecorButton = null;
-
-function closeDecorPopover(){
-  const pop = $("#decorPopover");
-  pop.hidden = true;
-  activeDecorTextarea = null;
-  activeDecorButton = null;
-}
-
-function openDecorPopover(button, textarea){
-  const pop = $("#decorPopover");
-  activeDecorTextarea = textarea;
-  activeDecorButton = button;
-  pop.hidden = false;
-
-  requestAnimationFrame(()=>{
-    const rect = button.getBoundingClientRect();
-    const popRect = pop.getBoundingClientRect();
-    const margin = 10;
-
-    let left = rect.left;
-    if(left + popRect.width > window.innerWidth - margin){
-      left = window.innerWidth - popRect.width - margin;
-    }
-    left = Math.max(margin, left);
-
-    let top = rect.bottom + 8;
-    if(top + popRect.height > window.innerHeight - margin){
-      top = rect.top - popRect.height - 8;
-    }
-    top = Math.max(margin, top);
-
-    pop.style.left = `${left}px`;
-    pop.style.top = `${top}px`;
-  });
-}
 
 function bindDecorPicker(toolbar, textarea){
   const btn = $(".decor-picker-btn", toolbar);
   if(!btn) return;
-
-  btn.addEventListener("click",(e)=>{
+  btn.addEventListener("click", (e)=>{
+    e.preventDefault();
     e.stopPropagation();
+    activeDecorTextarea = textarea;
     const pop = $("#decorPopover");
-    if(!pop.hidden && activeDecorButton === btn){
-      closeDecorPopover();
-      return;
-    }
-    openDecorPopover(btn, textarea);
+    pop.hidden = !pop.hidden;
   });
+}
+
+function closeDecorPopover(){
+  $("#decorPopover").hidden = true;
+  activeDecorTextarea = null;
 }
 
 function bindCharacterCard(card){
@@ -275,11 +245,9 @@ function refreshChecks(total){
 
   // Unsupported / unconfirmed Markdown
   const mdWarnings = [];
-  if (/~~.+?~~/.test(text)) mdWarnings.push("取り消し線（~~ ~~）");
   if (/\[[^\]]+\]\([^)]+\)/.test(text)) mdWarnings.push("Markdownリンク");
   if (/!\[[^\]]*\]\([^)]+\)/.test(text)) mdWarnings.push("Markdown画像");
   if (/```/.test(text)) mdWarnings.push("コードブロック");
-  if (/`[^`]+`/.test(text)) mdWarnings.push("インラインコード");
   if (/<\/?[a-z][^>]*>/i.test(text)) mdWarnings.push("HTMLタグ");
   if (/^\s*\|.+\|\s*$/m.test(text)) mdWarnings.push("Markdown表");
   $("#markdownResults").innerHTML = mdWarnings.length
@@ -428,30 +396,23 @@ function init(){
       ta.setSelectionRange(ta.value.length,ta.value.length);
     });
   });
-
-
   $$("#decorPopover [data-decor]").forEach(btn=>{
-    btn.addEventListener("click",(e)=>{
-      e.stopPropagation();
+    btn.addEventListener("click",()=>{
       if(!activeDecorTextarea) return;
       const decor = btn.dataset.decor || "";
       const ta = activeDecorTextarea;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const value = ta.value;
-      ta.value = value.slice(0,start) + decor + value.slice(end);
+      const start = ta.selectionStart ?? ta.value.length;
+      const end = ta.selectionEnd ?? start;
+      ta.value = ta.value.slice(0,start) + decor + ta.value.slice(end);
       const pos = start + decor.length;
-      ta.setSelectionRange(pos,pos);
       ta.focus();
+      ta.setSelectionRange(pos,pos);
       closeDecorPopover();
       syncFromUI();
     });
   });
 
-  $("#closeDecorPopover").addEventListener("click",(e)=>{
-    e.stopPropagation();
-    closeDecorPopover();
-  });
+  $("#closeDecorPopover").addEventListener("click", closeDecorPopover);
 
   document.addEventListener("click",(e)=>{
     const pop = $("#decorPopover");
@@ -460,11 +421,7 @@ function init(){
     if(e.target.closest(".decor-picker-btn")) return;
     closeDecorPopover();
   });
-
-  window.addEventListener("resize", closeDecorPopover);
-  window.addEventListener("scroll", closeDecorPopover, {passive:true});
-
-  initSwipe();
+initSwipe();
 
   const hash = location.hash.replace("#","");
   if(["story","characters","preview","check"].includes(hash)) setPage(hash);

@@ -50,8 +50,13 @@
 
         <div class="editor-card">
           <div class="format-toolbar" data-target="storyText">
-            <button type="button" data-insert="## " title="見出し">H2</button>
+            <button type="button" data-insert="# " title="H1">H1</button>
+            <button type="button" data-insert="## " title="H2">H2</button>
+            <button type="button" data-insert="### " title="H3">H3</button>
             <button type="button" data-wrap="**" title="太字"><b>B</b></button>
+            <button type="button" data-wrap="*" title="イタリック"><i>I</i></button>
+            <button type="button" data-wrap="~~" title="打ち消し線"><s>S</s></button>
+            <button type="button" data-wrap="`" title="インラインコード">&lt;/&gt;</button>
             <button type="button" data-insert="> " title="引用">❯</button>
             <button type="button" data-insert="- " title="箇条書き">•</button>
             <button type="button" data-insert="{{user}}" title="{{user}}を挿入">{ }</button>
@@ -184,12 +189,18 @@
       </div>
 
       <div class="format-toolbar">
+        <button type="button" data-insert="# ">H1</button>
         <button type="button" data-insert="## ">H2</button>
+        <button type="button" data-insert="### ">H3</button>
         <button type="button" data-wrap="**"><b>B</b></button>
+        <button type="button" data-wrap="*"><i>I</i></button>
+        <button type="button" data-wrap="~~"><s>S</s></button>
+        <button type="button" data-wrap="`">&lt;/&gt;</button>
         <button type="button" data-insert="> ">❯</button>
         <button type="button" data-insert="- ">•</button>
         <button type="button" data-insert="{{user}}">{ }</button>
-        <button type="button" class="decor-picker-btn" title="装飾">♡</button>
+        <button type="button" class="decor-picker-btn" title="装飾">✦</button>
+        <button type="button" data-insert="━━━━━━━━━━" title="罫線">━</button>
       </div>
 
       <textarea class="char-text editor" spellcheck="true"
@@ -222,6 +233,10 @@
       <button type="button" data-decor="◢">◢</button>
       <button type="button" data-decor="▣">▣</button>
       <button type="button" data-decor="◆">◆</button>
+      <button type="button" data-decor="◇">◇</button>
+      <button type="button" data-decor="⋆">⋆</button>
+      <button type="button" data-decor="☾">☾</button>
+      <button type="button" data-decor="𓆩♡𓆪">𓆩♡𓆪</button>
     </div>
   </div>
 
