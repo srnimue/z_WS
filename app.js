@@ -102,7 +102,7 @@ function addCharacter(data={name:"",text:""}){
 }
 
 function bindToolbar(toolbar, textarea){
-  $$("button",toolbar).forEach(btn=>{
+  $$("button",toolbar).filter(btn=>!btn.classList.contains("decor-picker-btn")).forEach(btn=>{
     btn.addEventListener("click",()=>{
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -125,9 +125,64 @@ function bindToolbar(toolbar, textarea){
   });
 }
 
+
+let activeDecorTextarea = null;
+let activeDecorButton = null;
+
+function closeDecorPopover(){
+  const pop = $("#decorPopover");
+  pop.hidden = true;
+  activeDecorTextarea = null;
+  activeDecorButton = null;
+}
+
+function openDecorPopover(button, textarea){
+  const pop = $("#decorPopover");
+  activeDecorTextarea = textarea;
+  activeDecorButton = button;
+  pop.hidden = false;
+
+  requestAnimationFrame(()=>{
+    const rect = button.getBoundingClientRect();
+    const popRect = pop.getBoundingClientRect();
+    const margin = 10;
+
+    let left = rect.left;
+    if(left + popRect.width > window.innerWidth - margin){
+      left = window.innerWidth - popRect.width - margin;
+    }
+    left = Math.max(margin, left);
+
+    let top = rect.bottom + 8;
+    if(top + popRect.height > window.innerHeight - margin){
+      top = rect.top - popRect.height - 8;
+    }
+    top = Math.max(margin, top);
+
+    pop.style.left = `${left}px`;
+    pop.style.top = `${top}px`;
+  });
+}
+
+function bindDecorPicker(toolbar, textarea){
+  const btn = $(".decor-picker-btn", toolbar);
+  if(!btn) return;
+
+  btn.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    const pop = $("#decorPopover");
+    if(!pop.hidden && activeDecorButton === btn){
+      closeDecorPopover();
+      return;
+    }
+    openDecorPopover(btn, textarea);
+  });
+}
+
 function bindCharacterCard(card){
   const ta = $(".char-text",card);
   bindToolbar($(".format-toolbar",card), ta);
+  bindDecorPicker($(".format-toolbar",card), ta);
 
   ["input","change"].forEach(evt=>{
     $(".char-name",card).addEventListener(evt,syncFromUI);
@@ -330,6 +385,7 @@ function init(){
   }
 
   bindToolbar($(".page[data-page='story'] .format-toolbar"), $("#storyText"));
+  bindDecorPicker($(".page[data-page='story'] .format-toolbar"), $("#storyText"));
 
   ["input","change"].forEach(evt=>{
     $("#projectTitle").addEventListener(evt,syncFromUI);
@@ -372,6 +428,41 @@ function init(){
       ta.setSelectionRange(ta.value.length,ta.value.length);
     });
   });
+
+
+  $$("#decorPopover [data-decor]").forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      if(!activeDecorTextarea) return;
+      const decor = btn.dataset.decor || "";
+      const ta = activeDecorTextarea;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const value = ta.value;
+      ta.value = value.slice(0,start) + decor + value.slice(end);
+      const pos = start + decor.length;
+      ta.setSelectionRange(pos,pos);
+      ta.focus();
+      closeDecorPopover();
+      syncFromUI();
+    });
+  });
+
+  $("#closeDecorPopover").addEventListener("click",(e)=>{
+    e.stopPropagation();
+    closeDecorPopover();
+  });
+
+  document.addEventListener("click",(e)=>{
+    const pop = $("#decorPopover");
+    if(pop.hidden) return;
+    if(pop.contains(e.target)) return;
+    if(e.target.closest(".decor-picker-btn")) return;
+    closeDecorPopover();
+  });
+
+  window.addEventListener("resize", closeDecorPopover);
+  window.addEventListener("scroll", closeDecorPopover, {passive:true});
 
   initSwipe();
 

@@ -55,8 +55,8 @@
             <button type="button" data-insert="> " title="引用">❯</button>
             <button type="button" data-insert="- " title="箇条書き">•</button>
             <button type="button" data-insert="{{user}}" title="{{user}}を挿入">{ }</button>
-            <button type="button" data-insert="✦ " title="装飾">✦</button>
-            <button type="button" data-insert="━━━━━━━━━━\n" title="罫線">━</button>
+            <button type="button" class="decor-picker-btn" title="装飾">✦</button>
+            <button type="button" data-insert="━━━━━━━━━━" title="罫線">━</button>
           </div>
           <textarea id="storyText" class="editor" spellcheck="true"
             placeholder="例：
@@ -189,7 +189,7 @@
         <button type="button" data-insert="> ">❯</button>
         <button type="button" data-insert="- ">•</button>
         <button type="button" data-insert="{{user}}">{ }</button>
-        <button type="button" data-insert="♡ ">♡</button>
+        <button type="button" class="decor-picker-btn" title="装飾">♡</button>
       </div>
 
       <textarea class="char-text editor" spellcheck="true"
@@ -202,6 +202,28 @@
 普段の印象、ギャップ、{{user}}との関係がどう変わり得るか。"></textarea>
     </article>
   </template>
+
+
+  <div id="decorPopover" class="decor-popover" hidden>
+    <div class="decor-popover-head">
+      <span>装飾を選択</span>
+      <button id="closeDecorPopover" type="button" aria-label="閉じる">×</button>
+    </div>
+    <div class="decor-grid">
+      <button type="button" data-decor="✦">✦</button>
+      <button type="button" data-decor="♡">♡</button>
+      <button type="button" data-decor="⚜">⚜</button>
+      <button type="button" data-decor="◈">◈</button>
+      <button type="button" data-decor="୨୧">୨୧</button>
+      <button type="button" data-decor="✧">✧</button>
+      <button type="button" data-decor="❀">❀</button>
+      <button type="button" data-decor="✟">✟</button>
+      <button type="button" data-decor="◤">◤</button>
+      <button type="button" data-decor="◢">◢</button>
+      <button type="button" data-decor="▣">▣</button>
+      <button type="button" data-decor="◆">◆</button>
+    </div>
+  </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
