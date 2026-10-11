@@ -14,7 +14,7 @@
         <div class="brand-mark">z_</div>
         <div>
           <div class="brand">Writer Studio</div>
-          <div class="subbrand">Unofficial writing helper</div>
+          <div class="subbrand">Public profile & plot presentation helper</div>
         </div>
       </div>
       <div class="top-actions">
@@ -42,14 +42,14 @@
       <section class="page active" data-page="story">
         <div class="page-head">
           <div>
-            <h1>全体紹介文</h1>
-            <p>世界に入りたくなる導入を書く場所。</p>
+            <h1>作品紹介</h1>
+            <p>世界観・物語・{{user}}の立場を、目に留まる形へ。</p>
           </div>
           <div class="count-box"><span id="storyCount">0</span>文字</div>
         </div>
 
         <div class="editor-card">
-          <div class="format-toolbar" data-target="storyText">
+          <div class="format-toolbar" data-editor="storyText">
             <button type="button" data-insert="# " title="H1">H1</button>
             <button type="button" data-insert="## " title="H2">H2</button>
             <button type="button" data-insert="### " title="H3">H3</button>
@@ -59,42 +59,41 @@
             <button type="button" data-wrap="`" title="インラインコード">&lt;/&gt;</button>
             <button type="button" data-insert="> " title="引用">❯</button>
             <button type="button" data-insert="- " title="箇条書き">•</button>
-            <button type="button" data-insert="{{user}}" title="{{user}}を挿入">{ }</button>
-            <button type="button" class="decor-picker-btn" title="装飾">✦</button>
+            <button type="button" data-insert="{{user}}" title="{{user}}">{ }</button>
+            <button type="button" data-open="decor" title="装飾">✦</button>
             <button type="button" data-insert="━━━━━━━━━━" title="罫線">━</button>
           </div>
           <textarea id="storyText" class="editor" spellcheck="true"
-            placeholder="例：
-## 逃げ場のない夜が、始まる。
-
-> 信じるか、疑うか。決めるのは{{user}}。
-
-ここに作品全体の紹介文を書きます。"></textarea>
+            placeholder="作品紹介文を書きます。"></textarea>
         </div>
 
-        <div class="helper-grid">
-          <button class="hint-card" data-template="hook">
-            <strong>冒頭フック</strong>
-            <span>3〜5行で興味を引く</span>
-          </button>
-          <button class="hint-card" data-template="experience">
-            <strong>体験を書く</strong>
-            <span>何ができる作品かを見せる</span>
-          </button>
-          <button class="hint-card" data-template="closing">
-            <strong>余韻で締める</strong>
-            <span>会話を始めたくなる一文</span>
-          </button>
-        </div>
+        <section class="block-section">
+          <div class="section-title-row">
+            <div>
+              <h2>作品紹介ブロック</h2>
+              <p>必要なパーツだけ、カーソル位置へ追加。</p>
+            </div>
+          </div>
+          <div class="block-palette">
+            <button type="button" data-story-block="hook">キャッチコピー</button>
+            <button type="button" data-story-block="world">世界観</button>
+            <button type="button" data-story-block="start">物語の始まり</button>
+            <button type="button" data-story-block="user">ユーザーの立場</button>
+            <button type="button" data-story-block="experience">遊べること</button>
+            <button type="button" data-story-block="cast">登場人物</button>
+            <button type="button" data-story-block="mystery">不穏な匂わせ</button>
+            <button type="button" data-story-block="closing">締め</button>
+          </div>
+        </section>
       </section>
 
       <section class="page" data-page="characters">
         <div class="page-head">
           <div>
             <h1>キャラクター紹介</h1>
-            <p>プロフィールではなく「話したい」を作る。</p>
+            <p>ユーザーに見せる情報だけを、魅力的に整える。</p>
           </div>
-          <div class="page-actions"><button id="characterTemplateBtn" class="ghost-btn" type="button">テンプレ挿入</button><button id="addCharacterBtn" class="primary-btn" type="button">＋ キャラ追加</button></div>
+          <button id="addCharacterBtn" class="primary-btn" type="button">＋ キャラ追加</button>
         </div>
         <div id="characterList" class="character-list"></div>
       </section>
@@ -103,25 +102,52 @@
         <div class="page-head">
           <div>
             <h1>プレビュー</h1>
-            <p>スマホ幅で全体の読み心地を確認。</p>
+            <p>作品紹介と各キャラ紹介を分けて確認。</p>
           </div>
-          <div class="page-actions"><button id="copyStoryBtn" class="ghost-btn" type="button">紹介文コピー</button><button id="copyCharactersBtn" class="primary-btn" type="button">キャラクターコピー</button></div>
         </div>
 
-        <div class="preview-phone">
-          <div class="preview-screen">
-            <div id="previewTitle" class="preview-title"></div>
-            <article id="storyPreview" class="markdown-body empty-state">全体紹介文のプレビュー</article>
-            <div id="charactersPreview"></div>
+        <section class="preview-section">
+          <div class="preview-section-head">
+            <div>
+              <strong>作品紹介</strong>
+              <span>zetaの作品紹介欄へ貼る部分</span>
+            </div>
+            <button id="copyStoryBtn" class="primary-btn" type="button">コピー</button>
           </div>
-        </div>
+          <div class="preview-phone compact">
+            <div class="preview-screen">
+              <div id="previewTitle" class="preview-title"></div>
+              <article id="storyPreview" class="markdown-body empty-state">作品紹介のプレビュー</article>
+            </div>
+          </div>
+        </section>
+
+        <section class="preview-section">
+          <div class="preview-section-head">
+            <div>
+              <strong>キャラクター紹介</strong>
+              <span>キャラごとの入力欄へ個別に貼る部分</span>
+            </div>
+          </div>
+          <div id="charactersPreview" class="character-preview-list"></div>
+        </section>
+
+        <section class="first-view-card">
+          <div class="preview-section-head">
+            <div>
+              <strong>ファーストビュー確認</strong>
+              <span>冒頭だけを切り出して、掴みを確認</span>
+            </div>
+          </div>
+          <div id="firstViewPreview" class="first-view-content"></div>
+        </section>
       </section>
 
       <section class="page" data-page="check">
         <div class="page-head">
           <div>
             <h1>チェック</h1>
-            <p>禁止判定ではなく、公開前の確認補助。</p>
+            <p>公開前の確認補助。禁止判定ではありません。</p>
           </div>
           <div id="scoreBadge" class="score-badge good">Good</div>
         </div>
@@ -129,16 +155,14 @@
         <div class="check-grid">
           <section class="check-card">
             <h2>文字数</h2>
-            <div class="meter">
-              <div id="meterBar" class="meter-bar"></div>
-            </div>
+            <div class="meter"><div id="meterBar" class="meter-bar"></div></div>
             <p><strong id="checkTotalCount">0</strong> / 10,000文字</p>
             <p id="countMessage" class="status-line"></p>
           </section>
 
           <section class="check-card">
             <h2>センシティブ表現</h2>
-            <p class="small">検出されても即NGではありません。文脈を確認するための注意表示です。</p>
+            <p class="small">検出されても即NGではありません。文脈確認用です。</p>
             <div id="sensitiveResults" class="result-list"></div>
           </section>
 
@@ -176,19 +200,13 @@
         <input class="char-name" placeholder="キャラクター名" />
         <div class="character-actions">
           <span class="char-count">0文字</span>
-          <button class="icon-btn duplicate-char" type="button" title="複製">⧉</button>
+          <button class="icon-btn copy-char" type="button" title="本文コピー">⧉</button>
+          <button class="icon-btn duplicate-char" type="button" title="複製">＋</button>
           <button class="icon-btn delete-char" type="button" title="削除">×</button>
         </div>
       </div>
 
-      <div class="guide-row">
-        <span>キャッチコピー</span>
-        <span>印象的なセリフ</span>
-        <span>ギャップ</span>
-        <span>{{user}}との関係</span>
-      </div>
-
-      <div class="format-toolbar">
+      <div class="format-toolbar" data-editor="character">
         <button type="button" data-insert="# ">H1</button>
         <button type="button" data-insert="## ">H2</button>
         <button type="button" data-insert="### ">H3</button>
@@ -199,47 +217,35 @@
         <button type="button" data-insert="> ">❯</button>
         <button type="button" data-insert="- ">•</button>
         <button type="button" data-insert="{{user}}">{ }</button>
-        <button type="button" class="decor-picker-btn" title="装飾">✦</button>
-        <button type="button" data-insert="━━━━━━━━━━" title="罫線">━</button>
+        <button type="button" data-open="decor">✦</button>
+        <button type="button" data-insert="━━━━━━━━━━">━</button>
       </div>
 
       <textarea class="char-text editor" spellcheck="true"
-        placeholder="例：
-## 名前
-**「冷たいくせに、なぜか目が離せない。」**
+        placeholder="ユーザーに見せるキャラクター紹介を書きます。"></textarea>
 
-> セリフ
-
-普段の印象、ギャップ、{{user}}との関係がどう変わり得るか。"></textarea>
+      <div class="char-block-area">
+        <div class="char-block-title">ブロック挿入</div>
+        <div class="block-palette">
+          <button type="button" data-char-block="basic">基本情報</button>
+          <button type="button" data-char-block="quote">セリフ</button>
+          <button type="button" data-char-block="first">第一印象</button>
+          <button type="button" data-char-block="personality">性格</button>
+          <button type="button" data-char-block="gap">ギャップ</button>
+          <button type="button" data-char-block="romance">恋愛重視</button>
+          <button type="button" data-char-block="mystery">ミステリアス</button>
+          <button type="button" data-char-block="conflict">対立</button>
+          <button type="button" data-char-block="relation">{{user}}との関係</button>
+          <button type="button" data-char-block="closing">締め</button>
+        </div>
+      </div>
     </article>
   </template>
 
-
-  
-  <div id="characterTemplatePopover" class="template-popover" hidden>
-    <div class="template-popover-head">
-      <div>
-        <strong>キャラクターテンプレート</strong>
-        <span>現在のキャラクター欄へ挿入</span>
-      </div>
-      <button id="closeCharacterTemplate" type="button" aria-label="閉じる">×</button>
-    </div>
-    <div class="template-popover-body">
-      <button type="button" class="template-choice" data-char-template="profile">
-        <strong>基本プロフィール</strong>
-        <span>名前・年齢・身長・性別・外見・性格・口調など</span>
-      </button>
-      <button type="button" class="template-choice" data-char-template="profile_markdown">
-        <strong>見出し付きプロフィール</strong>
-        <span>Markdown見出しを使って読みやすく整形</span>
-      </button>
-    </div>
-  </div>
-
-  <div id="decorPopover" class="decor-popover" hidden>
-    <div class="decor-popover-head">
-      <span>装飾を選択</span>
-      <button id="closeDecorPopover" type="button" aria-label="閉じる">×</button>
+  <div id="decorPopover" class="sheet" hidden>
+    <div class="sheet-head">
+      <strong>装飾を選択</strong>
+      <button type="button" data-close-sheet>×</button>
     </div>
     <div class="decor-grid">
       <button type="button" data-decor="✦">✦</button>
@@ -262,7 +268,6 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
   <script src="./app.js"></script>
 </body>
 </html>
