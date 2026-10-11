@@ -94,7 +94,7 @@
             <h1>キャラクター紹介</h1>
             <p>プロフィールではなく「話したい」を作る。</p>
           </div>
-          <button id="addCharacterBtn" class="primary-btn" type="button">＋ キャラ追加</button>
+          <div class="page-actions"><button id="characterTemplateBtn" class="ghost-btn" type="button">テンプレ挿入</button><button id="addCharacterBtn" class="primary-btn" type="button">＋ キャラ追加</button></div>
         </div>
         <div id="characterList" class="character-list"></div>
       </section>
@@ -105,7 +105,7 @@
             <h1>プレビュー</h1>
             <p>スマホ幅で全体の読み心地を確認。</p>
           </div>
-          <button id="copyAllBtn" class="primary-btn" type="button">全部コピー</button>
+          <div class="page-actions"><button id="copyStoryBtn" class="ghost-btn" type="button">紹介文コピー</button><button id="copyCharactersBtn" class="primary-btn" type="button">キャラクターコピー</button></div>
         </div>
 
         <div class="preview-phone">
@@ -214,6 +214,27 @@
     </article>
   </template>
 
+
+  
+  <div id="characterTemplatePopover" class="template-popover" hidden>
+    <div class="template-popover-head">
+      <div>
+        <strong>キャラクターテンプレート</strong>
+        <span>現在のキャラクター欄へ挿入</span>
+      </div>
+      <button id="closeCharacterTemplate" type="button" aria-label="閉じる">×</button>
+    </div>
+    <div class="template-popover-body">
+      <button type="button" class="template-choice" data-char-template="profile">
+        <strong>基本プロフィール</strong>
+        <span>名前・年齢・身長・性別・外見・性格・口調など</span>
+      </button>
+      <button type="button" class="template-choice" data-char-template="profile_markdown">
+        <strong>見出し付きプロフィール</strong>
+        <span>Markdown見出しを使って読みやすく整形</span>
+      </button>
+    </div>
+  </div>
 
   <div id="decorPopover" class="decor-popover" hidden>
     <div class="decor-popover-head">

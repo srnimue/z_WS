@@ -130,6 +130,63 @@ function bindToolbar(toolbar, textarea){
 }
 
 
+
+const CHARACTER_TEMPLATE_PLAIN = `名前:
+年齢:
+身長:
+性別:
+外見:
+性格:
+口調:
+一人称:
+二人称:
+好き:
+嫌い:
+備考:`;
+
+const CHARACTER_TEMPLATE_MARKDOWN = `## 名前
+
+- 年齢:
+- 身長:
+- 性別:
+- 外見:
+- 性格:
+- 口調:
+- 一人称:
+- 二人称:
+- 好き:
+- 嫌い:
+- 備考:`;
+
+function getActiveCharacterTextarea(){
+  const cards = $$(".character-card");
+  if(!cards.length) return null;
+  // Prefer the focused character textarea, otherwise the last card.
+  const focused = document.activeElement;
+  if(focused && focused.classList?.contains("char-text")) return focused;
+  return $(".char-text", cards.at(-1));
+}
+
+function insertCharacterTemplate(kind){
+  let ta = getActiveCharacterTextarea();
+  if(!ta){
+    addCharacter();
+    syncFromUI();
+    const cards = $$(".character-card");
+    ta = $(".char-text", cards.at(-1));
+  }
+  const template = kind === "profile_markdown" ? CHARACTER_TEMPLATE_MARKDOWN : CHARACTER_TEMPLATE_PLAIN;
+  const start = ta.selectionStart ?? ta.value.length;
+  const end = ta.selectionEnd ?? start;
+  const prefix = ta.value && start > 0 && !ta.value.endsWith("\n") ? "\n\n" : "";
+  ta.value = ta.value.slice(0,start) + prefix + template + ta.value.slice(end);
+  const pos = start + prefix.length + template.length;
+  ta.focus();
+  ta.setSelectionRange(pos,pos);
+  $("#characterTemplatePopover").hidden = true;
+  syncFromUI();
+}
+
 let activeDecorTextarea = null;
 
 function bindDecorPicker(toolbar, textarea){
@@ -294,14 +351,29 @@ function showToast(msg){
   showToast.timer = setTimeout(()=>t.classList.remove("show"),1500);
 }
 
-async function copyAll(){
-  let out = state.story.trim();
-  for(const c of state.characters){
-    if(!c.name.trim() && !c.text.trim()) continue;
-    out += `\n\n━━━━━━━━━━\n${c.name || "Character"}\n\n${c.text.trim()}`;
-  }
-  await navigator.clipboard.writeText(out.trim());
-  showToast("コピーしました");
+async function copyStory(){
+  const text = state.story.trim();
+  if(!text){ showToast("紹介文が空です"); return; }
+  await navigator.clipboard.writeText(text);
+  showToast("紹介文をコピーしました");
+}
+
+async function copyCharacters(){
+  const blocks = state.characters
+    .filter(c=>c.name.trim() || c.text.trim())
+    .map((c,i)=>{
+      const head = c.name.trim() ? `【${c.name.trim()}】
+` : "";
+      return head + c.text.trim();
+    })
+    .filter(Boolean);
+
+  if(!blocks.length){ showToast("キャラクター紹介が空です"); return; }
+
+  await navigator.clipboard.writeText(blocks.join("
+
+"));
+  showToast("キャラクター紹介をコピーしました");
 }
 
 function exportText(){
@@ -319,27 +391,6 @@ function exportText(){
   URL.revokeObjectURL(a.href);
 }
 
-function initSwipe(){
-  let startX=0, startY=0;
-  const order=["story","characters","preview","check"];
-  $("#pages").addEventListener("touchstart",e=>{
-    if(e.touches.length!==1) return;
-    startX=e.touches[0].clientX;
-    startY=e.touches[0].clientY;
-  },{passive:true});
-
-  $("#pages").addEventListener("touchend",e=>{
-    if(!startX) return;
-    const dx=e.changedTouches[0].clientX-startX;
-    const dy=e.changedTouches[0].clientY-startY;
-    startX=0;
-    if(Math.abs(dx)<70 || Math.abs(dx)<Math.abs(dy)*1.35) return;
-    const current=$(".tab.active").dataset.page;
-    const i=order.indexOf(current);
-    if(dx<0 && i<order.length-1) setPage(order[i+1]);
-    if(dx>0 && i>0) setPage(order[i-1]);
-  },{passive:true});
-}
 
 function init(){
   load();
@@ -373,7 +424,8 @@ function init(){
 
   $$(".tab").forEach(tab=>tab.addEventListener("click",()=>setPage(tab.dataset.page)));
 
-  $("#copyAllBtn").addEventListener("click",copyAll);
+  $("#copyStoryBtn").addEventListener("click",copyStory);
+  $("#copyCharactersBtn").addEventListener("click",copyCharacters);
   $("#exportBtn").addEventListener("click",exportText);
 
   $("#resetBtn").addEventListener("click",()=>{
@@ -396,6 +448,29 @@ function init(){
       ta.setSelectionRange(ta.value.length,ta.value.length);
     });
   });
+
+  $("#characterTemplateBtn").addEventListener("click",(e)=>{
+    e.stopPropagation();
+    const pop = $("#characterTemplatePopover");
+    pop.hidden = !pop.hidden;
+  });
+
+  $("#closeCharacterTemplate").addEventListener("click",()=>{
+    $("#characterTemplatePopover").hidden = true;
+  });
+
+  $$("#characterTemplatePopover [data-char-template]").forEach(btn=>{
+    btn.addEventListener("click",()=>insertCharacterTemplate(btn.dataset.charTemplate));
+  });
+
+  document.addEventListener("click",(e)=>{
+    const pop = $("#characterTemplatePopover");
+    if(pop.hidden) return;
+    if(pop.contains(e.target)) return;
+    if(e.target.closest("#characterTemplateBtn")) return;
+    pop.hidden = true;
+  });
+
   $$("#decorPopover [data-decor]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       if(!activeDecorTextarea) return;
